@@ -53,25 +53,20 @@
         #readLetterBtn { background: #8b4513; color: white; }
         #planDateBtn { background: #2d6a4f; color: white; }
 
-        .shake { animation: shakeBtn 0.5s ease-in-out infinite; }
-        @keyframes shakeBtn { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
-
         /* --- Modals --- */
         .modal {
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 85%; max-width: 400px; background: var(--parchment); padding: 25px;
             border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1001;
-            text-align: center; border: 2px solid #d2b48c; max-height: 80vh; overflow-y: auto;
+            text-align: center; border: 2px solid #d2b48c; max-height: 85vh; overflow-y: auto;
         }
-        .modal h2 { font-family: 'Georgia', serif; color: var(--deep-red); margin-top: 0; }
-        .modal p { font-family: 'Georgia', serif; font-style: italic; line-height: 1.5; color: #5d4037; }
         
         /* --- Form Styles --- */
         .form-group { text-align: left; margin-bottom: 15px; }
         label { display: block; font-size: 0.9rem; color: #5d4037; margin-bottom: 5px; font-weight: bold; }
-        input, textarea { width: 100%; padding: 10px; border: 1px solid #d2b48c; border-radius: 8px; box-sizing: border-box; font-family: sans-serif; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #d2b48c; border-radius: 8px; box-sizing: border-box; }
         
-        .close-btn { margin-top: 15px; background: #c9184a; color: white; padding: 10px 20px; font-size: 0.9rem; border-radius: 20px; }
+        .status-msg { font-size: 0.8rem; margin-top: 10px; display: none; }
     </style>
 </head>
 <body onclick="shootFlower()">
@@ -102,31 +97,32 @@
     </div>
 
     <div id="letter-modal" class="modal">
-        <h2>To My Valentine,</h2>
-        <p>
-            Since the moment I met you, life has felt a little more like a game I've already won. Thank you for being the amazing person you are. I can't wait to spend the 14th with you!<br><br>
-            With love,<br>
-            [Your Name]
+        <h2 style="color: var(--deep-red)">To My Valentine,</h2>
+        <p style="font-family: Georgia; font-style: italic;">
+            My Love at first sight, my inspiration, my light in the darkness, my hope and my purpose, my princess, my ezer. This is our 4th Valentine and my love for your keeps on growing. You're still the love of my life, now and forever.<br>
+            Your Charming Knight :P
         </p>
-        <button class="close-btn" onclick="closeModal('letter-modal')">Back</button>
+        <button onclick="closeModal('letter-modal')" style="background: #8b4513; color: white; padding: 10px 20px; border-radius: 20px;">Close</button>
     </div>
 
     <div id="plan-modal" class="modal">
-        <h2>Valentine's Planner</h2>
-        <p>Tell me what you're dreaming of...</p>
-        <div class="form-group">
-            <label>What do you want to do?</label>
-            <input type="text" id="doInput" placeholder="e.g. Movie night, Arcade, Picnic...">
-        </div>
-        <div class="form-group">
-            <label>Where should we go?</label>
-            <input type="text" id="goInput" placeholder="e.g. That new Italian place...">
-        </div>
-        <div class="form-group">
-            <label>Any special requests? (Food, gifts, etc.)</label>
-            <textarea id="extraInput" rows="3" placeholder="e.g. I really want sushi!"></textarea>
-        </div>
-        <button class="close-btn" style="background: #2d6a4f;" onclick="submitPlan()">Save Plan ❤️</button>
+        <h2 style="color: #2d6a4f">Valentine's Planner</h2>
+        <form id="dateForm" action="https://formspree.io/f/xbdkvkrj" method="POST">
+            <div class="form-group">
+                <label>What do you want to do love?</label>
+                <input type="text" name="activity" required placeholder="Food Date, Movie Date, F...">
+            </div>
+            <div class="form-group">
+                <label>Where do you wanna go?</label>
+                <input type="text" name="location" required placeholder="Restaurant name, Motel name etc...">
+            </div>
+            <div class="form-group">
+                <label>Special requests/Gift Request hahaha?</label>
+                <textarea name="requests" rows="2" placeholder="Gift, Bag, F..."></textarea>
+            </div>
+            <button type="submit" id="submitBtn" style="background: #2d6a4f; color: white; width: 100%; border-radius: 10px;">Send it to MEE</button>
+            <div id="status" class="status-msg"></div>
+        </form>
     </div>
 
     <script>
@@ -177,7 +173,7 @@
                 const p = document.createElement('div');
                 p.className = 'petal bloom-anim';
                 p.style.transform = `rotate(${i * 45}deg)`;
-                p.style.animationDelay = (i * 0.15) + 's';
+                p.style.animationDelay = (i * 0.1) + 's';
                 container.appendChild(p);
             }
         }
@@ -185,10 +181,7 @@
         function moveNo() {
             noAttempts++;
             const btn = document.getElementById('noBtn');
-            if (noAttempts >= 3) {
-                document.getElementById('hint-text').style.opacity = '1';
-                document.getElementById('yesBtn').classList.add('shake');
-            }
+            if (noAttempts >= 3) document.getElementById('hint-text').style.opacity = '1';
             const maxX = window.innerWidth - btn.offsetWidth - 20;
             const maxY = window.innerHeight - btn.offsetHeight - 20;
             btn.style.left = Math.max(10, Math.floor(Math.random() * maxX)) + 'px';
@@ -207,10 +200,30 @@
         function openModal(id) { document.getElementById(id).style.display = 'block'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        function submitPlan() {
-            alert("Plan saved! I can't wait! 🥰");
-            closeModal('plan-modal');
+        // Formspree Handling
+        const form = document.getElementById("dateForm");
+        async function handleSubmit(event) {
+            event.preventDefault();
+            const status = document.getElementById("status");
+            const data = new FormData(event.target);
+            fetch(event.target.action, {
+                method: form.method,
+                body: data,
+                headers: { 'Accept': 'application/json' }
+            }).then(response => {
+                if (response.ok) {
+                    status.innerHTML = "Sent! I can't wait! 🥰";
+                    status.style.display = "block";
+                    status.style.color = "#2d6a4f";
+                    form.reset();
+                    setTimeout(() => closeModal('plan-modal'), 2000);
+                } else {
+                    status.innerHTML = "Oops! Try again.";
+                    status.style.display = "block";
+                }
+            });
         }
+        form.addEventListener("submit", handleSubmit);
 
         function createHeart() {
             const h = document.createElement('div');
