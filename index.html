@@ -32,16 +32,16 @@
 
         #ui-layer {
             position: absolute;
-            top: 100px;
+            top: 120px;
             text-align: center;
             z-index: 5;
-            pointer-events: none;
+            width: 100%;
         }
 
         #score-board {
             font-size: 28px;
             color: var(--deep-red);
-            text-shadow: 1px 1px 0px white;
+            margin: 0;
         }
 
         #basket {
@@ -50,60 +50,88 @@
             font-size: 60px;
             width: 80px;
             text-align: center;
-            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));
+            z-index: 10;
         }
 
         .flower-projectile {
             position: absolute;
             bottom: -50px;
             font-size: 35px;
-            transition: transform 0.1s linear;
+            z-index: 2;
         }
 
-        /* --- The "Better" Flower Animation --- */
+        /* --- Valentine Screen --- */
         #valentine-screen {
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* Changed from center to prevent overlap */
             height: 100vh;
+            padding-top: 50px;
         }
 
         .flower-container {
             position: relative;
             width: 150px;
-            height: 150px;
+            height: 180px; /* Space for flower + stem */
+            margin-bottom: 20px;
         }
 
         .petal {
             position: absolute;
-            width: 70px;
-            height: 100px;
+            width: 60px;
+            height: 90px;
             background: linear-gradient(to top, var(--deep-red), var(--rose-pink));
             border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%;
-            left: 40px;
+            left: 45px;
             transform-origin: bottom center;
             opacity: 0;
             box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+            z-index: 2;
         }
 
-        .bloom-anim { animation: bloomIn 2.5s ease-out forwards; }
+        .stem {
+            position: absolute;
+            width: 6px;
+            height: 100px;
+            background: #2d6a4f;
+            left: 72px;
+            top: 80px;
+            border-radius: 5px;
+            z-index: 1;
+            opacity: 0;
+        }
+
+        .bloom-anim { animation: bloomIn 2s ease-out forwards; }
+        .stem-anim { animation: fadeIn 1s ease-out 0.5s forwards; }
 
         @keyframes bloomIn {
             0% { transform: scale(0) rotate(0deg); opacity: 0; }
             100% { opacity: 0.9; }
         }
 
-        h1 { color: var(--deep-red); margin: 40px 20px 20px; text-align: center; font-size: 1.8rem; }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
 
-        .btn-group { display: flex; gap: 20px; }
+        h1 { 
+            color: var(--deep-red); 
+            margin: 20px; 
+            text-align: center; 
+            font-size: 1.6rem;
+            z-index: 10;
+            position: relative;
+        }
+
+        .btn-group { display: flex; gap: 20px; position: relative; z-index: 10; }
+        
         button {
             padding: 15px 35px;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             border: none;
             border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3);
             font-weight: bold;
+            cursor: pointer;
         }
         #yesBtn { background: var(--rose-pink); color: white; }
         #noBtn { background: #adb5bd; color: white; position: absolute; }
@@ -114,14 +142,15 @@
     <div id="game-container">
         <div id="basket">🧺</div>
         <div id="ui-layer">
-            <div id="score-board">Score: <span id="score">0</span> / 10</div>
-            <div style="color: #ff758f;">Tap to shoot her a flower!</div>
+            <p id="score-board">Score: <span id="score">0</span> / 10</p>
+            <p style="color: #ff758f;">Tap to catch 10 roses!</p>
         </div>
     </div>
 
     <div id="valentine-screen">
         <div class="flower-container" id="final-flower">
-            </div>
+            <div class="stem" id="stem"></div>
+        </div>
         <h1 id="valentine-text">You caught my heart!<br>Will you be my Valentine?</h1>
         <div class="btn-group">
             <button id="yesBtn" onclick="celebrate()">YES</button>
@@ -135,7 +164,6 @@
         let basketPos = 50;
         let basketDir = 1;
 
-        // Move Basket at the top
         setInterval(() => {
             basketPos += (2.5 * basketDir);
             if (basketPos > 80 || basketPos < 10) basketDir *= -1;
@@ -144,7 +172,6 @@
 
         function shootFlower() {
             if (score >= 10) return;
-
             const f = document.createElement('div');
             f.className = 'flower-projectile';
             f.innerHTML = '🌹';
@@ -155,11 +182,9 @@
             const shootInterval = setInterval(() => {
                 currentBottom += 12;
                 f.style.bottom = currentBottom + 'px';
-
                 const fRect = f.getBoundingClientRect();
                 const bRect = basket.getBoundingClientRect();
 
-                // Collision with basket at top
                 if (fRect.top <= bRect.bottom && fRect.left < bRect.right && fRect.right > bRect.left) {
                     score++;
                     document.getElementById('score').innerText = score;
@@ -167,7 +192,6 @@
                     clearInterval(shootInterval);
                     if (score >= 10) startValentine();
                 }
-
                 if (currentBottom > window.innerHeight) {
                     f.remove();
                     clearInterval(shootInterval);
@@ -177,15 +201,16 @@
 
         function startValentine() {
             document.getElementById('game-container').style.display = 'none';
-            const screen = document.getElementById('valentine-screen');
-            screen.style.display = 'flex';
+            document.getElementById('valentine-screen').style.display = 'flex';
             
             const container = document.getElementById('final-flower');
+            document.getElementById('stem').className = 'stem stem-anim';
+            
             for(let i=0; i<8; i++) {
                 const p = document.createElement('div');
                 p.className = 'petal bloom-anim';
                 p.style.transform = `rotate(${i * 45}deg)`;
-                p.style.animationDelay = (i * 0.2) + 's';
+                p.style.animationDelay = (i * 0.15) + 's';
                 container.appendChild(p);
             }
         }
