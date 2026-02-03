@@ -2,27 +2,74 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Special Surprise</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Catch the Flowers!</title>
     <style>
         body {
             margin: 0;
+            padding: 0;
             height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             background-color: #fff0f3;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Arial', sans-serif;
             overflow: hidden;
+            touch-action: manipulation;
         }
 
-        /* --- Flower Animation --- */
-        .flower {
+        /* --- Game Styles --- */
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #score-board {
+            font-size: 24px;
+            color: #ff4d6d;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        #instruction {
+            font-size: 14px;
+            color: #808080;
+        }
+
+        .flower-projectile {
+            position: absolute;
+            font-size: 30px;
+            bottom: 20px;
+            transition: bottom 0.5s linear;
+        }
+
+        #basket {
+            position: absolute;
+            bottom: 80px;
+            font-size: 50px;
+            width: 60px;
+            text-align: center;
+        }
+
+        /* --- Valentine Screen (Hidden Initially) --- */
+        #valentine-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .flower-final {
             position: relative;
             width: 100px;
             height: 100px;
-            animation: bloom 3s ease-in-out forwards;
+            animation: bloom 2s ease-in-out forwards;
         }
 
         .petal {
@@ -32,88 +79,111 @@
             height: 80px;
             border-radius: 50% 50% 10% 10%;
             transform-origin: bottom center;
-            opacity: 0;
-            animation: fadeIn 2s ease-in-out forwards;
         }
 
         @keyframes bloom {
-            0% { transform: scale(0.5) rotate(0deg); }
-            100% { transform: scale(1.2) rotate(360deg); }
+            0% { transform: scale(0.5); }
+            100% { transform: scale(1.2); }
         }
 
-        @keyframes fadeIn {
-            to { opacity: 0.9; }
-        }
-
-        /* Positioning petals in a circle */
         .p1 { transform: rotate(0deg); }
         .p2 { transform: rotate(72deg); }
         .p3 { transform: rotate(144deg); }
         .p4 { transform: rotate(216deg); }
         .p5 { transform: rotate(288deg); }
 
-        /* --- Text and Buttons --- */
-        #content {
-            text-align: center;
-            margin-top: 50px;
-            opacity: 0;
-            transition: opacity 2s ease-in;
-        }
-
-        h1 { color: #c9184a; font-size: 1.8rem; }
-
-        .buttons { margin-top: 20px; }
-
+        h1 { color: #c9184a; margin-top: 30px; font-size: 1.5rem; }
+        
         button {
             padding: 15px 30px;
             font-size: 1.2rem;
             border: none;
             border-radius: 25px;
-            cursor: pointer;
-            transition: 0.3s;
+            margin: 10px;
         }
-
-        #yesBtn { background-color: #ff4d6d; color: white; }
-        #noBtn { background-color: #808080; color: white; position: absolute; }
+        #yesBtn { background: #ff4d6d; color: white; }
+        #noBtn { background: #808080; color: white; position: absolute; }
     </style>
 </head>
-<body>
+<body onclick="shootFlower()">
 
-    <div class="flower">
-        <div class="petal p1"></div>
-        <div class="petal p2"></div>
-        <div class="petal p3"></div>
-        <div class="petal p4"></div>
-        <div class="petal p5"></div>
+    <div id="game-container">
+        <div id="score-board">Score: <span id="score">0</span> / 10</div>
+        <div id="instruction">Tap anywhere to shoot the flower!</div>
+        <div id="basket">🧺</div>
     </div>
 
-    <div id="content">
+    <div id="valentine-screen">
+        <div class="flower-final">
+            <div class="petal p1"></div>
+            <div class="petal p2"></div>
+            <div class="petal p3"></div>
+            <div class="petal p4"></div>
+            <div class="petal p5"></div>
+        </div>
         <h1>Will you be my Valentine? 🌹</h1>
-        <div class="buttons">
-            <button id="yesBtn" onclick="celebrate()">Yes!</button>
-            <button id="noBtn" onmouseover="moveButton()">No</button>
+        <div>
+            <button id="yesBtn" onclick="alert('Yay! ❤️')">Yes!</button>
+            <button id="noBtn" onmouseover="moveNo()">No</button>
         </div>
     </div>
 
     <script>
-        // Reveal content after flower blooms
-        setTimeout(() => {
-            document.getElementById('content').style.opacity = '1';
-        }, 3000);
+        let score = 0;
+        const basket = document.getElementById('basket');
+        const scoreEl = document.getElementById('score');
+        let basketDir = 1;
+        let basketPos = 50;
 
-        function moveButton() {
-            const x = Math.random() * (window.innerWidth - 100);
-            const y = Math.random() * (window.innerHeight - 100);
-            const btn = document.getElementById('noBtn');
-            btn.style.left = x + 'px';
-            btn.style.top = y + 'px';
+        // Move the basket back and forth
+        setInterval(() => {
+            basketPos += (2 * basketDir);
+            if (basketPos > 85 || basketPos < 5) basketDir *= -1;
+            basket.style.left = basketPos + '%';
+        }, 20);
+
+        function shootFlower() {
+            if (score >= 10) return;
+
+            const flower = document.createElement('div');
+            flower.className = 'flower-projectile';
+            flower.innerHTML = '🌸';
+            flower.style.left = '50%';
+            document.getElementById('game-container').appendChild(flower);
+
+            let bottom = 20;
+            const interval = setInterval(() => {
+                bottom += 10;
+                flower.style.bottom = bottom + 'px';
+
+                // Collision detection
+                const fRect = flower.getBoundingClientRect();
+                const bRect = basket.getBoundingClientRect();
+
+                if (fRect.top <= bRect.bottom && fRect.left < bRect.right && fRect.right > bRect.left) {
+                    score++;
+                    scoreEl.innerText = score;
+                    flower.remove();
+                    clearInterval(interval);
+                    if (score >= 10) showValentine();
+                }
+
+                if (bottom > window.innerHeight) {
+                    flower.remove();
+                    clearInterval(interval);
+                }
+            }, 20);
         }
 
-        function celebrate() {
-            document.body.innerHTML = `
-                <h1 style="color: #c9184a;">Yay! I'll see you on the 14th! ❤️</h1>
-                <div style="font-size: 50px;">🥰🌹✨</div>
-            `;
+        function showValentine() {
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('valentine-screen').style.display = 'flex';
+        }
+
+        function moveNo() {
+            const btn = document.getElementById('noBtn');
+            btn.style.left = Math.random() * 70 + '%';
+            btn.style.top = Math.random() * 70 + '%';
         }
     </script>
 </body>
