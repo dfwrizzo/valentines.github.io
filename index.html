@@ -43,36 +43,35 @@
         h1 { color: var(--deep-red); margin: 15px; text-align: center; font-size: 1.5rem; line-height: 1.3; }
         #hint-text { color: var(--deep-red); font-weight: bold; height: 20px; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s; }
 
-        .btn-group { display: flex; gap: 20px; justify-content: center; width: 100%; height: 120px; position: relative; }
-        button { padding: 15px 35px; font-size: 1.1rem; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
-        #yesBtn { background: var(--rose-pink); color: white; position: relative; z-index: 10; }
+        .btn-group { display: flex; flex-direction: column; gap: 10px; align-items: center; width: 100%; position: relative; }
+        .row { display: flex; gap: 20px; justify-content: center; width: 100%; }
+        button { padding: 15px 30px; font-size: 1rem; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        #yesBtn { background: var(--rose-pink); color: white; z-index: 10; }
         #noBtn { background: #adb5bd; color: white; position: absolute; z-index: 100; transition: left 0.2s ease, top 0.2s ease; }
         
+        .secondary-btn { display: none; width: 220px; margin-top: 10px; }
+        #readLetterBtn { background: #8b4513; color: white; }
+        #planDateBtn { background: #2d6a4f; color: white; }
+
         .shake { animation: shakeBtn 0.5s ease-in-out infinite; }
         @keyframes shakeBtn { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
-        /* --- Letter Styles --- */
-        #letter-container {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 85%;
-            max-width: 400px;
-            background: var(--parchment);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            z-index: 1000;
-            text-align: center;
-            border: 2px solid #d2b48c;
-            max-height: 70vh;
-            overflow-y: auto;
+        /* --- Modals --- */
+        .modal {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 85%; max-width: 400px; background: var(--parchment); padding: 25px;
+            border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1001;
+            text-align: center; border: 2px solid #d2b48c; max-height: 80vh; overflow-y: auto;
         }
-        #letter-container h2 { font-family: 'Georgia', serif; color: var(--deep-red); margin-top: 0; }
-        #letter-container p { font-family: 'Georgia', serif; font-style: italic; line-height: 1.6; color: #5d4037; font-size: 1.1rem; }
-        .close-letter { margin-top: 20px; background: #8b4513; color: white; padding: 10px 20px; font-size: 0.9rem; }
+        .modal h2 { font-family: 'Georgia', serif; color: var(--deep-red); margin-top: 0; }
+        .modal p { font-family: 'Georgia', serif; font-style: italic; line-height: 1.5; color: #5d4037; }
+        
+        /* --- Form Styles --- */
+        .form-group { text-align: left; margin-bottom: 15px; }
+        label { display: block; font-size: 0.9rem; color: #5d4037; margin-bottom: 5px; font-weight: bold; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #d2b48c; border-radius: 8px; box-sizing: border-box; font-family: sans-serif; }
+        
+        .close-btn { margin-top: 15px; background: #c9184a; color: white; padding: 10px 20px; font-size: 0.9rem; border-radius: 20px; }
     </style>
 </head>
 <body onclick="shootFlower()">
@@ -91,21 +90,43 @@
         </div>
         <h1 id="valentine-text">You caught my heart!<br>Will you be my Valentine?</h1>
         <div id="hint-text">Nice try! 😉</div>
+        
         <div class="btn-group" id="btnGroup">
-            <button id="yesBtn" onclick="celebrate()">YES</button>
-            <button id="noBtn" onmouseover="moveNo()" ontouchstart="moveNo()">NO</button>
+            <div class="row" id="mainBtns">
+                <button id="yesBtn" onclick="celebrate()">YES</button>
+                <button id="noBtn" onmouseover="moveNo()" ontouchstart="moveNo()">NO</button>
+            </div>
+            <button id="readLetterBtn" class="secondary-btn" onclick="openModal('letter-modal')">Read my letter 💌</button>
+            <button id="planDateBtn" class="secondary-btn" onclick="openModal('plan-modal')">Plan our date 🗓️</button>
         </div>
-        <button id="readLetterBtn" style="display:none; background: #8b4513; color: white;" onclick="openLetter()">Read my letter 💌</button>
     </div>
 
-    <div id="letter-container" id="letter">
+    <div id="letter-modal" class="modal">
         <h2>To My Valentine,</h2>
-        <p id="personalized-message">
+        <p>
             Since the moment I met you, life has felt a little more like a game I've already won. Thank you for being the amazing person you are. I can't wait to spend the 14th with you!<br><br>
             With love,<br>
             [Your Name]
         </p>
-        <button class="close-letter" onclick="closeLetter()">Close Letter</button>
+        <button class="close-btn" onclick="closeModal('letter-modal')">Back</button>
+    </div>
+
+    <div id="plan-modal" class="modal">
+        <h2>Valentine's Planner</h2>
+        <p>Tell me what you're dreaming of...</p>
+        <div class="form-group">
+            <label>What do you want to do?</label>
+            <input type="text" id="doInput" placeholder="e.g. Movie night, Arcade, Picnic...">
+        </div>
+        <div class="form-group">
+            <label>Where should we go?</label>
+            <input type="text" id="goInput" placeholder="e.g. That new Italian place...">
+        </div>
+        <div class="form-group">
+            <label>Any special requests? (Food, gifts, etc.)</label>
+            <textarea id="extraInput" rows="3" placeholder="e.g. I really want sushi!"></textarea>
+        </div>
+        <button class="close-btn" style="background: #2d6a4f;" onclick="submitPlan()">Save Plan ❤️</button>
     </div>
 
     <script>
@@ -176,18 +197,19 @@
 
         function celebrate() {
             document.getElementById('valentine-text').innerHTML = "I knew you'd say yes! ❤️";
-            document.getElementById('btnGroup').style.display = 'none';
+            document.getElementById('mainBtns').style.display = 'none';
             document.getElementById('hint-text').style.display = 'none';
             document.getElementById('readLetterBtn').style.display = 'block';
+            document.getElementById('planDateBtn').style.display = 'block';
             for(let i=0; i<30; i++) { setTimeout(createHeart, i * 100); }
         }
 
-        function openLetter() {
-            document.getElementById('letter-container').style.display = 'block';
-        }
+        function openModal(id) { document.getElementById(id).style.display = 'block'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        function closeLetter() {
-            document.getElementById('letter-container').style.display = 'none';
+        function submitPlan() {
+            alert("Plan saved! I can't wait! 🥰");
+            closeModal('plan-modal');
         }
 
         function createHeart() {
