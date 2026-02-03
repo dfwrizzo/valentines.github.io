@@ -3,24 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Catch the Flowers!</title>
+    <title>Catch My Love</title>
     <style>
+        :root {
+            --rose-pink: #ff4d6d;
+            --soft-pink: #fff0f3;
+            --deep-red: #c9184a;
+        }
+
         body {
             margin: 0;
             padding: 0;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #fff0f3;
-            font-family: 'Arial', sans-serif;
+            background: radial-gradient(circle, #fff0f3 0%, #ffccd5 100%);
+            font-family: 'Arial Rounded MT Bold', 'Helvetica', sans-serif;
             overflow: hidden;
             touch-action: manipulation;
         }
 
-        /* --- Game Styles --- */
+        /* --- Game Elements --- */
         #game-container {
-            position: relative;
             width: 100%;
             height: 100%;
             display: flex;
@@ -28,162 +30,177 @@
             align-items: center;
         }
 
-        #score-board {
-            font-size: 24px;
-            color: #ff4d6d;
-            margin-top: 20px;
-            font-weight: bold;
-        }
-
-        #instruction {
-            font-size: 14px;
-            color: #808080;
-        }
-
-        .flower-projectile {
+        #ui-layer {
             position: absolute;
-            font-size: 30px;
-            bottom: 20px;
-            transition: bottom 0.5s linear;
+            top: 100px;
+            text-align: center;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        #score-board {
+            font-size: 28px;
+            color: var(--deep-red);
+            text-shadow: 1px 1px 0px white;
         }
 
         #basket {
             position: absolute;
-            bottom: 80px;
-            font-size: 50px;
-            width: 60px;
+            top: 20px;
+            font-size: 60px;
+            width: 80px;
             text-align: center;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));
         }
 
-        /* --- Valentine Screen (Hidden Initially) --- */
+        .flower-projectile {
+            position: absolute;
+            bottom: -50px;
+            font-size: 35px;
+            transition: transform 0.1s linear;
+        }
+
+        /* --- The "Better" Flower Animation --- */
         #valentine-screen {
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            text-align: center;
         }
 
-        .flower-final {
+        .flower-container {
             position: relative;
-            width: 100px;
-            height: 100px;
-            animation: bloom 2s ease-in-out forwards;
+            width: 150px;
+            height: 150px;
         }
 
         .petal {
             position: absolute;
-            background: #ff4d6d;
-            width: 50px;
-            height: 80px;
-            border-radius: 50% 50% 10% 10%;
+            width: 70px;
+            height: 100px;
+            background: linear-gradient(to top, var(--deep-red), var(--rose-pink));
+            border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%;
+            left: 40px;
             transform-origin: bottom center;
+            opacity: 0;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
         }
 
-        @keyframes bloom {
-            0% { transform: scale(0.5); }
-            100% { transform: scale(1.2); }
+        .bloom-anim { animation: bloomIn 2.5s ease-out forwards; }
+
+        @keyframes bloomIn {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            100% { opacity: 0.9; }
         }
 
-        .p1 { transform: rotate(0deg); }
-        .p2 { transform: rotate(72deg); }
-        .p3 { transform: rotate(144deg); }
-        .p4 { transform: rotate(216deg); }
-        .p5 { transform: rotate(288deg); }
+        h1 { color: var(--deep-red); margin: 40px 20px 20px; text-align: center; font-size: 1.8rem; }
 
-        h1 { color: #c9184a; margin-top: 30px; font-size: 1.5rem; }
-        
+        .btn-group { display: flex; gap: 20px; }
         button {
-            padding: 15px 30px;
+            padding: 15px 35px;
             font-size: 1.2rem;
             border: none;
-            border-radius: 25px;
-            margin: 10px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3);
+            font-weight: bold;
         }
-        #yesBtn { background: #ff4d6d; color: white; }
-        #noBtn { background: #808080; color: white; position: absolute; }
+        #yesBtn { background: var(--rose-pink); color: white; }
+        #noBtn { background: #adb5bd; color: white; position: absolute; }
     </style>
 </head>
 <body onclick="shootFlower()">
 
     <div id="game-container">
-        <div id="score-board">Score: <span id="score">0</span> / 10</div>
-        <div id="instruction">Tap anywhere to shoot the flower!</div>
         <div id="basket">🧺</div>
+        <div id="ui-layer">
+            <div id="score-board">Score: <span id="score">0</span> / 10</div>
+            <div style="color: #ff758f;">Tap to shoot her a flower!</div>
+        </div>
     </div>
 
     <div id="valentine-screen">
-        <div class="flower-final">
-            <div class="petal p1"></div>
-            <div class="petal p2"></div>
-            <div class="petal p3"></div>
-            <div class="petal p4"></div>
-            <div class="petal p5"></div>
-        </div>
-        <h1>Will you be my Valentine? 🌹</h1>
-        <div>
-            <button id="yesBtn" onclick="alert('Yay! ❤️')">Yes!</button>
-            <button id="noBtn" onmouseover="moveNo()">No</button>
+        <div class="flower-container" id="final-flower">
+            </div>
+        <h1 id="valentine-text">You caught my heart!<br>Will you be my Valentine?</h1>
+        <div class="btn-group">
+            <button id="yesBtn" onclick="celebrate()">YES</button>
+            <button id="noBtn" onmouseover="moveNo()" onclick="moveNo()">NO</button>
         </div>
     </div>
 
     <script>
         let score = 0;
         const basket = document.getElementById('basket');
-        const scoreEl = document.getElementById('score');
-        let basketDir = 1;
         let basketPos = 50;
+        let basketDir = 1;
 
-        // Move the basket back and forth
+        // Move Basket at the top
         setInterval(() => {
-            basketPos += (2 * basketDir);
-            if (basketPos > 85 || basketPos < 5) basketDir *= -1;
+            basketPos += (2.5 * basketDir);
+            if (basketPos > 80 || basketPos < 10) basketDir *= -1;
             basket.style.left = basketPos + '%';
         }, 20);
 
         function shootFlower() {
             if (score >= 10) return;
 
-            const flower = document.createElement('div');
-            flower.className = 'flower-projectile';
-            flower.innerHTML = '🌸';
-            flower.style.left = '50%';
-            document.getElementById('game-container').appendChild(flower);
+            const f = document.createElement('div');
+            f.className = 'flower-projectile';
+            f.innerHTML = '🌹';
+            f.style.left = '50%';
+            document.getElementById('game-container').appendChild(f);
 
-            let bottom = 20;
-            const interval = setInterval(() => {
-                bottom += 10;
-                flower.style.bottom = bottom + 'px';
+            let currentBottom = 0;
+            const shootInterval = setInterval(() => {
+                currentBottom += 12;
+                f.style.bottom = currentBottom + 'px';
 
-                // Collision detection
-                const fRect = flower.getBoundingClientRect();
+                const fRect = f.getBoundingClientRect();
                 const bRect = basket.getBoundingClientRect();
 
+                // Collision with basket at top
                 if (fRect.top <= bRect.bottom && fRect.left < bRect.right && fRect.right > bRect.left) {
                     score++;
-                    scoreEl.innerText = score;
-                    flower.remove();
-                    clearInterval(interval);
-                    if (score >= 10) showValentine();
+                    document.getElementById('score').innerText = score;
+                    f.remove();
+                    clearInterval(shootInterval);
+                    if (score >= 10) startValentine();
                 }
 
-                if (bottom > window.innerHeight) {
-                    flower.remove();
-                    clearInterval(interval);
+                if (currentBottom > window.innerHeight) {
+                    f.remove();
+                    clearInterval(shootInterval);
                 }
-            }, 20);
+            }, 16);
         }
 
-        function showValentine() {
+        function startValentine() {
             document.getElementById('game-container').style.display = 'none';
-            document.getElementById('valentine-screen').style.display = 'flex';
+            const screen = document.getElementById('valentine-screen');
+            screen.style.display = 'flex';
+            
+            const container = document.getElementById('final-flower');
+            for(let i=0; i<8; i++) {
+                const p = document.createElement('div');
+                p.className = 'petal bloom-anim';
+                p.style.transform = `rotate(${i * 45}deg)`;
+                p.style.animationDelay = (i * 0.2) + 's';
+                container.appendChild(p);
+            }
         }
 
         function moveNo() {
             const btn = document.getElementById('noBtn');
-            btn.style.left = Math.random() * 70 + '%';
-            btn.style.top = Math.random() * 70 + '%';
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = Math.random() * (window.innerHeight - 100);
+            btn.style.left = x + 'px';
+            btn.style.top = y + 'px';
+        }
+
+        function celebrate() {
+            document.getElementById('valentine-text').innerHTML = "I knew you'd say yes! ❤️";
+            document.querySelector('.btn-group').style.display = 'none';
         }
     </script>
 </body>
