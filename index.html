@@ -30,20 +30,6 @@
             align-items: center;
         }
 
-        #ui-layer {
-            position: absolute;
-            top: 120px;
-            text-align: center;
-            z-index: 5;
-            width: 100%;
-        }
-
-        #score-board {
-            font-size: 28px;
-            color: var(--deep-red);
-            margin: 0;
-        }
-
         #basket {
             position: absolute;
             top: 20px;
@@ -52,6 +38,16 @@
             text-align: center;
             z-index: 10;
         }
+
+        #ui-layer {
+            position: absolute;
+            top: 130px;
+            text-align: center;
+            z-index: 5;
+            width: 100%;
+        }
+
+        #score-board { font-size: 28px; color: var(--deep-red); margin: 0; }
 
         .flower-projectile {
             position: absolute;
@@ -65,44 +61,42 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Changed from center to prevent overlap */
             height: 100vh;
-            padding-top: 50px;
+            padding-top: 40px;
+            box-sizing: border-box;
         }
 
         .flower-container {
             position: relative;
             width: 150px;
-            height: 180px; /* Space for flower + stem */
-            margin-bottom: 20px;
+            height: 160px;
+            margin-bottom: 10px;
         }
 
         .petal {
             position: absolute;
-            width: 60px;
-            height: 90px;
+            width: 55px;
+            height: 85px;
             background: linear-gradient(to top, var(--deep-red), var(--rose-pink));
             border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%;
-            left: 45px;
+            left: 48px;
             transform-origin: bottom center;
             opacity: 0;
             box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
-            z-index: 2;
         }
 
         .stem {
             position: absolute;
             width: 6px;
-            height: 100px;
+            height: 80px;
             background: #2d6a4f;
             left: 72px;
             top: 80px;
             border-radius: 5px;
-            z-index: 1;
             opacity: 0;
         }
 
-        .bloom-anim { animation: bloomIn 2s ease-out forwards; }
+        .bloom-anim { animation: bloomIn 1.5s ease-out forwards; }
         .stem-anim { animation: fadeIn 1s ease-out 0.5s forwards; }
 
         @keyframes bloomIn {
@@ -110,20 +104,24 @@
             100% { opacity: 0.9; }
         }
 
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
+        @keyframes fadeIn { to { opacity: 1; } }
 
         h1 { 
             color: var(--deep-red); 
-            margin: 20px; 
+            margin: 15px; 
             text-align: center; 
-            font-size: 1.6rem;
-            z-index: 10;
-            position: relative;
+            font-size: 1.5rem;
+            line-height: 1.3;
         }
 
-        .btn-group { display: flex; gap: 20px; position: relative; z-index: 10; }
+        .btn-group { 
+            display: flex; 
+            gap: 20px; 
+            justify-content: center;
+            width: 100%;
+            height: 100px;
+            position: relative;
+        }
         
         button {
             padding: 15px 35px;
@@ -131,10 +129,19 @@
             border: none;
             border-radius: 50px;
             font-weight: bold;
-            cursor: pointer;
+            transition: transform 0.1s;
         }
-        #yesBtn { background: var(--rose-pink); color: white; }
-        #noBtn { background: #adb5bd; color: white; position: absolute; }
+
+        #yesBtn { background: var(--rose-pink); color: white; position: relative; z-index: 10; }
+        
+        #noBtn { 
+            background: #adb5bd; 
+            color: white; 
+            position: absolute; 
+            z-index: 100;
+            /* Ensures smooth movement */
+            transition: left 0.2s ease, top 0.2s ease; 
+        }
     </style>
 </head>
 <body onclick="shootFlower()">
@@ -143,7 +150,7 @@
         <div id="basket">🧺</div>
         <div id="ui-layer">
             <p id="score-board">Score: <span id="score">0</span> / 10</p>
-            <p style="color: #ff758f;">Tap to catch 10 roses!</p>
+            <p style="color: #ff758f;">Catch 10 roses for a surprise!</p>
         </div>
     </div>
 
@@ -152,9 +159,9 @@
             <div class="stem" id="stem"></div>
         </div>
         <h1 id="valentine-text">You caught my heart!<br>Will you be my Valentine?</h1>
-        <div class="btn-group">
+        <div class="btn-group" id="btnGroup">
             <button id="yesBtn" onclick="celebrate()">YES</button>
-            <button id="noBtn" onmouseover="moveNo()" onclick="moveNo()">NO</button>
+            <button id="noBtn" onmouseover="moveNo()" ontouchstart="moveNo()">NO</button>
         </div>
     </div>
 
@@ -164,6 +171,7 @@
         let basketPos = 50;
         let basketDir = 1;
 
+        // Basket movement logic
         setInterval(() => {
             basketPos += (2.5 * basketDir);
             if (basketPos > 80 || basketPos < 10) basketDir *= -1;
@@ -202,10 +210,8 @@
         function startValentine() {
             document.getElementById('game-container').style.display = 'none';
             document.getElementById('valentine-screen').style.display = 'flex';
-            
             const container = document.getElementById('final-flower');
             document.getElementById('stem').className = 'stem stem-anim';
-            
             for(let i=0; i<8; i++) {
                 const p = document.createElement('div');
                 p.className = 'petal bloom-anim';
@@ -215,17 +221,42 @@
             }
         }
 
+        // The Moving "No" Button Logic
         function moveNo() {
             const btn = document.getElementById('noBtn');
-            const x = Math.random() * (window.innerWidth - 100);
-            const y = Math.random() * (window.innerHeight - 100);
-            btn.style.left = x + 'px';
-            btn.style.top = y + 'px';
+            // Constraints to keep it within the phone screen
+            const maxX = window.innerWidth - btn.offsetWidth - 20;
+            const maxY = window.innerHeight - btn.offsetHeight - 20;
+            
+            const randomX = Math.max(10, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(10, Math.floor(Math.random() * maxY));
+            
+            btn.style.left = randomX + 'px';
+            btn.style.top = randomY + 'px';
         }
 
         function celebrate() {
-            document.getElementById('valentine-text').innerHTML = "I knew you'd say yes! ❤️";
-            document.querySelector('.btn-group').style.display = 'none';
+            document.getElementById('valentine-text').innerHTML = "I knew you'd say yes! ❤️<br><span style='font-size: 0.8em;'>See you on the 14th!</span>";
+            document.getElementById('btnGroup').style.display = 'none';
+            // Add extra celebration effect
+            for(let i=0; i<20; i++) {
+                createHeart();
+            }
+        }
+
+        function createHeart() {
+            const h = document.createElement('div');
+            h.innerHTML = '❤️';
+            h.style.position = 'fixed';
+            h.style.left = Math.random() * 100 + 'vw';
+            h.style.top = '100vh';
+            h.style.fontSize = (Math.random() * 20 + 10) + 'px';
+            h.style.transition = `transform ${Math.random() * 2 + 2}s linear, opacity 2s`;
+            document.body.appendChild(h);
+            setTimeout(() => {
+                h.style.transform = `translateY(-110vh) rotate(${Math.random() * 360}deg)`;
+                h.style.opacity = '0';
+            }, 100);
         }
     </script>
 </body>
