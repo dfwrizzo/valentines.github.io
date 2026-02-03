@@ -3,70 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Catch My Love</title>
+    <title>~* Catch My Love v4.0 *~</title>
     <style>
         :root {
-            --rose-pink: #ff4d6d;
-            --soft-pink: #fff0f3;
-            --deep-red: #c9184a;
-            --parchment: #fdf5e6;
+            --cyber-pink: #ff007f;
+            --neon-blue: #00f2ff;
+            --glass-white: rgba(255, 255, 255, 0.85);
+            --y2k-gradient: linear-gradient(180deg, #00f2ff 0%, #ff007f 100%);
         }
 
         body {
             margin: 0;
             padding: 0;
             height: 100vh;
-            background: radial-gradient(circle, #fff0f3 0%, #ffccd5 100%);
-            font-family: 'Arial Rounded MT Bold', 'Helvetica', sans-serif;
+            background: #ffccd5;
+            /* Y2K Grid Pattern Overlay */
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.4) 1px, transparent 1px);
+            background-size: 25px 25px;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', sans-serif;
             overflow: hidden;
             touch-action: manipulation;
         }
 
         /* --- Game Elements --- */
         #game-container { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; }
-        #basket { position: absolute; top: 20px; font-size: 60px; width: 80px; text-align: center; z-index: 10; }
+        #basket { position: absolute; top: 20px; font-size: 60px; filter: drop-shadow(0 0 8px var(--neon-blue)); z-index: 10; }
         #ui-layer { position: absolute; top: 130px; text-align: center; z-index: 5; width: 100%; }
-        #score-board { font-size: 28px; color: var(--deep-red); margin: 0; }
-        .flower-projectile { position: absolute; bottom: -50px; font-size: 35px; z-index: 2; }
+        #score-board { 
+            font-size: 32px; 
+            color: #fff; 
+            text-shadow: 2px 2px var(--cyber-pink), -1px -1px var(--neon-blue);
+            font-weight: 900;
+        }
+        .flower-projectile { position: absolute; bottom: -50px; font-size: 35px; }
+
+        /* --- Y2K Glass Modals --- */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 88%;
+            max-width: 400px;
+            background: var(--glass-white);
+            border: 3px solid #fff;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.2), 8px 8px 0px rgba(0,0,0,0.1);
+            border-radius: 25px;
+            z-index: 1001;
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            border: 2px solid var(--neon-blue);
+        }
+
+        .window-header {
+            background: var(--y2k-gradient);
+            padding: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-align: left;
+            border-bottom: 2px solid #fff;
+            letter-spacing: 1px;
+        }
+
+        .modal-content { padding: 25px; text-align: center; }
+
+        /* --- Jelly/Glossy Buttons --- */
+        button { 
+            padding: 12px 25px; 
+            font-size: 1rem; 
+            border: 2px solid #fff; 
+            border-radius: 50px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+
+        #yesBtn, #submitBtn, .close-btn {
+            background: linear-gradient(180deg, #ff4db8 0%, #ff007f 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 0, 127, 0.3);
+        }
+
+        #noBtn { 
+            background: linear-gradient(180deg, #00f2ff 0%, #0099ff 100%); 
+            color: white;
+            position: absolute; 
+        }
+
+        .secondary-btn { 
+            display: none; 
+            width: 240px; 
+            margin: 10px auto;
+            background: var(--glass-white);
+            color: var(--cyber-pink);
+            border: 2px solid var(--cyber-pink);
+        }
 
         /* --- Valentine Screen --- */
-        #valentine-screen { display: none; flex-direction: column; align-items: center; height: 100vh; padding-top: 40px; box-sizing: border-box; }
-        .flower-container { position: relative; width: 150px; height: 160px; margin-bottom: 10px; }
-        .petal { position: absolute; width: 55px; height: 85px; background: linear-gradient(to top, var(--deep-red), var(--rose-pink)); border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%; left: 48px; transform-origin: bottom center; opacity: 0; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
-        .stem { position: absolute; width: 6px; height: 80px; background: #2d6a4f; left: 72px; top: 80px; border-radius: 5px; opacity: 0; }
-        .bloom-anim { animation: bloomIn 1.5s ease-out forwards; }
-        .stem-anim { animation: fadeIn 1s ease-out 0.5s forwards; }
-
-        @keyframes bloomIn { 0% { transform: scale(0) rotate(0deg); opacity: 0; } 100% { opacity: 0.9; } }
-        @keyframes fadeIn { to { opacity: 1; } }
-
-        h1 { color: var(--deep-red); margin: 15px; text-align: center; font-size: 1.5rem; line-height: 1.3; }
-        #hint-text { color: var(--deep-red); font-weight: bold; height: 20px; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s; }
-
-        .btn-group { display: flex; flex-direction: column; gap: 10px; align-items: center; width: 100%; position: relative; }
-        .row { display: flex; gap: 20px; justify-content: center; width: 100%; }
-        button { padding: 15px 30px; font-size: 1rem; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        #yesBtn { background: var(--rose-pink); color: white; z-index: 10; }
-        #noBtn { background: #adb5bd; color: white; position: absolute; z-index: 100; transition: left 0.2s ease, top 0.2s ease; }
-        
-        .secondary-btn { display: none; width: 220px; margin-top: 10px; }
-        #readLetterBtn { background: #8b4513; color: white; }
-        #planDateBtn { background: #2d6a4f; color: white; }
-
-        /* --- Modals --- */
-        .modal {
-            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 85%; max-width: 400px; background: var(--parchment); padding: 25px;
-            border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1001;
-            text-align: center; border: 2px solid #d2b48c; max-height: 85vh; overflow-y: auto;
+        #valentine-screen { display: none; flex-direction: column; align-items: center; padding-top: 40px; }
+        h1 { 
+            color: #fff; 
+            text-shadow: 3px 3px var(--cyber-pink); 
+            font-size: 1.6rem;
+            -webkit-text-stroke: 1px var(--cyber-pink);
+            text-align: center;
         }
-        
-        /* --- Form Styles --- */
-        .form-group { text-align: left; margin-bottom: 15px; }
-        label { display: block; font-size: 0.9rem; color: #5d4037; margin-bottom: 5px; font-weight: bold; }
-        input, textarea { width: 100%; padding: 10px; border: 1px solid #d2b48c; border-radius: 8px; box-sizing: border-box; }
-        
-        .status-msg { font-size: 0.8rem; margin-top: 10px; display: none; }
+
+        /* --- Form Styling --- */
+        input, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            margin-top: 5px;
+            background: rgba(255, 255, 255, 0.6);
+            border: 2px solid var(--neon-blue); 
+            border-radius: 12px; 
+            box-sizing: border-box;
+            font-weight: bold;
+            color: var(--cyber-pink);
+        }
     </style>
 </head>
 <body onclick="shootFlower()">
@@ -74,55 +133,59 @@
     <div id="game-container">
         <div id="basket">🧺</div>
         <div id="ui-layer">
-            <p id="score-board">Score: <span id="score">0</span> / 10</p>
-            <p style="color: #ff758f;">Catch 10 roses for a surprise!</p>
+            <p id="score-board">LOVE_SCORE: <span id="score">0</span> / 10</p>
+            <p style="color: #fff; font-weight: bold; text-shadow: 1px 1px var(--cyber-pink);">Catch 10 roses for a surprise!</p>
         </div>
     </div>
 
     <div id="valentine-screen">
-        <div class="flower-container" id="final-flower">
-            <div class="stem" id="stem"></div>
-        </div>
+        <div id="final-flower" style="font-size: 70px; margin-bottom: 10px;">💖</div>
         <h1 id="valentine-text">You caught my heart!<br>Will you be my Valentine?</h1>
-        <div id="hint-text">Nice try! 😉</div>
+        <div id="hint-text" style="color: #fff; font-weight: bold; opacity: 0;">Nice try! 😉</div>
         
         <div class="btn-group" id="btnGroup">
-            <div class="row" id="mainBtns">
-                <button id="yesBtn" onclick="celebrate()">YES</button>
+            <div class="row" id="mainBtns" style="height: 100px; width: 100%; position: relative; display: flex; justify-content: center; gap: 20px;">
+                <button id="yesBtn" onclick="celebrate()">YES!!</button>
                 <button id="noBtn" onmouseover="moveNo()" ontouchstart="moveNo()">NO</button>
             </div>
-            <button id="readLetterBtn" class="secondary-btn" onclick="openModal('letter-modal')">Read my letter 💌</button>
-            <button id="planDateBtn" class="secondary-btn" onclick="openModal('plan-modal')">Plan our date 🗓️</button>
+            <button id="readLetterBtn" class="secondary-btn" onclick="openModal('letter-modal')">Open Message 💌</button>
+            <button id="planDateBtn" class="secondary-btn" style="border-color: var(--neon-blue); color: var(--neon-blue);" onclick="openModal('plan-modal')">Planner.exe 🗓️</button>
         </div>
     </div>
 
     <div id="letter-modal" class="modal">
-        <h2 style="color: var(--deep-red)">To My Valentine,</h2>
-        <p style="font-family: Georgia; font-style: italic;">
-            My Love at first sight, my inspiration, my light in the darkness, my hope and my purpose, my princess, my ezer. This is our 4th Valentine and my love for your keeps on growing. You're still the love of my life, now and forever.<br>
-            Your Charming Knight :P
-        </p>
-        <button onclick="closeModal('letter-modal')" style="background: #8b4513; color: white; padding: 10px 20px; border-radius: 20px;">Close</button>
+        <div class="window-header">MESSAGE_FOR_YOU.TXT</div>
+        <div class="modal-content">
+            <p style="font-style: italic; color: #444; line-height: 1.6;">
+                "My Love at first sight, my inspiration, my light in the darkness, my hope and my purpose, my princess, my ezer. <br><br>
+                This is our <b>4th Valentine</b> and my love for you keeps on growing. You're still the love of my life, now and forever."
+                <br><br>
+                <b>- Your Charming Knight :P</b>
+            </p>
+            <button class="close-btn" onclick="closeModal('letter-modal')">CLOSE</button>
+        </div>
     </div>
 
     <div id="plan-modal" class="modal">
-        <h2 style="color: #2d6a4f">Valentine's Planner</h2>
-        <form id="dateForm" action="https://formspree.io/f/xbdkvkrj" method="POST">
-            <div class="form-group">
-                <label>What do you want to do love?</label>
-                <input type="text" name="activity" required placeholder="Food Date, Movie Date, F...">
-            </div>
-            <div class="form-group">
-                <label>Where do you wanna go?</label>
-                <input type="text" name="location" required placeholder="Restaurant name, Motel name etc...">
-            </div>
-            <div class="form-group">
-                <label>Special requests/Gift Request hahaha?</label>
-                <textarea name="requests" rows="2" placeholder="Gift, Bag, F..."></textarea>
-            </div>
-            <button type="submit" id="submitBtn" style="background: #2d6a4f; color: white; width: 100%; border-radius: 10px;">Send it to MEE</button>
-            <div id="status" class="status-msg"></div>
-        </form>
+        <div class="window-header">DATE_PLANNER_WIZARD.EXE</div>
+        <div class="modal-content">
+            <form id="dateForm" action="https://formspree.io/f/xbdkvkrj" method="POST">
+                <div class="form-group" style="text-align: left; margin-bottom: 10px;">
+                    <label style="font-size: 0.8rem; color: var(--cyber-pink);">What do you want to do love?</label>
+                    <input type="text" name="activity" required placeholder="Food, Movie, Arcade...">
+                </div>
+                <div class="form-group" style="text-align: left; margin-bottom: 10px;">
+                    <label style="font-size: 0.8rem; color: var(--cyber-pink);">Where do you wanna go?</label>
+                    <input type="text" name="location" required placeholder="Restaurant, Park, etc...">
+                </div>
+                <div class="form-group" style="text-align: left; margin-bottom: 15px;">
+                    <label style="font-size: 0.8rem; color: var(--cyber-pink);">Gift / Special Requests?</label>
+                    <textarea name="requests" rows="2" placeholder="Bag, Flowers, Chocolate..."></textarea>
+                </div>
+                <button type="submit" id="submitBtn" style="width: 100%;">SEND TO ME!!</button>
+                <div id="status" class="status-msg"></div>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -148,7 +211,7 @@
 
             let currentBottom = 0;
             const shootInterval = setInterval(() => {
-                currentBottom += 12;
+                currentBottom += 15;
                 f.style.bottom = currentBottom + 'px';
                 const fRect = f.getBoundingClientRect();
                 const bRect = basket.getBoundingClientRect();
@@ -167,15 +230,6 @@
         function startValentine() {
             document.getElementById('game-container').style.display = 'none';
             document.getElementById('valentine-screen').style.display = 'flex';
-            const container = document.getElementById('final-flower');
-            document.getElementById('stem').className = 'stem stem-anim';
-            for(let i=0; i<8; i++) {
-                const p = document.createElement('div');
-                p.className = 'petal bloom-anim';
-                p.style.transform = `rotate(${i * 45}deg)`;
-                p.style.animationDelay = (i * 0.1) + 's';
-                container.appendChild(p);
-            }
         }
 
         function moveNo() {
@@ -200,7 +254,6 @@
         function openModal(id) { document.getElementById(id).style.display = 'block'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // Formspree Handling
         const form = document.getElementById("dateForm");
         async function handleSubmit(event) {
             event.preventDefault();
@@ -212,13 +265,13 @@
                 headers: { 'Accept': 'application/json' }
             }).then(response => {
                 if (response.ok) {
-                    status.innerHTML = "Sent! I can't wait! 🥰";
+                    status.innerHTML = "SENT SUCCESSFULLY! 🥰";
                     status.style.display = "block";
-                    status.style.color = "#2d6a4f";
+                    status.style.color = "var(--cyber-pink)";
                     form.reset();
                     setTimeout(() => closeModal('plan-modal'), 2000);
                 } else {
-                    status.innerHTML = "Oops! Try again.";
+                    status.innerHTML = "ERROR! TRY AGAIN.";
                     status.style.display = "block";
                 }
             });
@@ -227,11 +280,11 @@
 
         function createHeart() {
             const h = document.createElement('div');
-            h.innerHTML = '❤️';
+            h.innerHTML = ['💖', '✨', '💿', '🦋'][Math.floor(Math.random()*4)];
             h.style.position = 'fixed';
             h.style.left = Math.random() * 100 + 'vw';
             h.style.top = '100vh';
-            h.style.fontSize = (Math.random() * 20 + 15) + 'px';
+            h.style.fontSize = (Math.random() * 20 + 20) + 'px';
             document.body.appendChild(h);
             const anim = h.animate([
                 { transform: 'translateY(0)', opacity: 1 },
