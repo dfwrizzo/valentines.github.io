@@ -114,12 +114,21 @@
             line-height: 1.3;
         }
 
+        #hint-text {
+            color: var(--deep-red);
+            font-weight: bold;
+            height: 20px;
+            margin-bottom: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
         .btn-group { 
             display: flex; 
             gap: 20px; 
             justify-content: center;
             width: 100%;
-            height: 100px;
+            height: 120px;
             position: relative;
         }
         
@@ -129,17 +138,22 @@
             border: none;
             border-radius: 50px;
             font-weight: bold;
-            transition: transform 0.1s;
         }
 
         #yesBtn { background: var(--rose-pink); color: white; position: relative; z-index: 10; }
         
+        .shake { animation: shakeBtn 0.5s ease-in-out infinite; }
+        @keyframes shakeBtn {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
         #noBtn { 
             background: #adb5bd; 
             color: white; 
             position: absolute; 
             z-index: 100;
-            /* Ensures smooth movement */
             transition: left 0.2s ease, top 0.2s ease; 
         }
     </style>
@@ -159,6 +173,7 @@
             <div class="stem" id="stem"></div>
         </div>
         <h1 id="valentine-text">You caught my heart!<br>Will you be my Valentine?</h1>
+        <div id="hint-text">Nice try! 😉</div>
         <div class="btn-group" id="btnGroup">
             <button id="yesBtn" onclick="celebrate()">YES</button>
             <button id="noBtn" onmouseover="moveNo()" ontouchstart="moveNo()">NO</button>
@@ -167,11 +182,11 @@
 
     <script>
         let score = 0;
+        let noAttempts = 0;
         const basket = document.getElementById('basket');
         let basketPos = 50;
         let basketDir = 1;
 
-        // Basket movement logic
         setInterval(() => {
             basketPos += (2.5 * basketDir);
             if (basketPos > 80 || basketPos < 10) basketDir *= -1;
@@ -200,10 +215,7 @@
                     clearInterval(shootInterval);
                     if (score >= 10) startValentine();
                 }
-                if (currentBottom > window.innerHeight) {
-                    f.remove();
-                    clearInterval(shootInterval);
-                }
+                if (currentBottom > window.innerHeight) { f.remove(); clearInterval(shootInterval); }
             }, 16);
         }
 
@@ -221,27 +233,28 @@
             }
         }
 
-        // The Moving "No" Button Logic
         function moveNo() {
+            noAttempts++;
             const btn = document.getElementById('noBtn');
-            // Constraints to keep it within the phone screen
+            const hint = document.getElementById('hint-text');
+            const yes = document.getElementById('yesBtn');
+
+            if (noAttempts >= 3) {
+                hint.style.opacity = '1';
+                yes.classList.add('shake');
+            }
+
             const maxX = window.innerWidth - btn.offsetWidth - 20;
             const maxY = window.innerHeight - btn.offsetHeight - 20;
-            
-            const randomX = Math.max(10, Math.floor(Math.random() * maxX));
-            const randomY = Math.max(10, Math.floor(Math.random() * maxY));
-            
-            btn.style.left = randomX + 'px';
-            btn.style.top = randomY + 'px';
+            btn.style.left = Math.max(10, Math.floor(Math.random() * maxX)) + 'px';
+            btn.style.top = Math.max(10, Math.floor(Math.random() * maxY)) + 'px';
         }
 
         function celebrate() {
             document.getElementById('valentine-text').innerHTML = "I knew you'd say yes! ❤️<br><span style='font-size: 0.8em;'>See you on the 14th!</span>";
             document.getElementById('btnGroup').style.display = 'none';
-            // Add extra celebration effect
-            for(let i=0; i<20; i++) {
-                createHeart();
-            }
+            document.getElementById('hint-text').style.display = 'none';
+            for(let i=0; i<30; i++) { setTimeout(createHeart, i * 100); }
         }
 
         function createHeart() {
@@ -250,13 +263,14 @@
             h.style.position = 'fixed';
             h.style.left = Math.random() * 100 + 'vw';
             h.style.top = '100vh';
-            h.style.fontSize = (Math.random() * 20 + 10) + 'px';
-            h.style.transition = `transform ${Math.random() * 2 + 2}s linear, opacity 2s`;
+            h.style.fontSize = (Math.random() * 20 + 15) + 'px';
+            h.style.zIndex = '1000';
             document.body.appendChild(h);
-            setTimeout(() => {
-                h.style.transform = `translateY(-110vh) rotate(${Math.random() * 360}deg)`;
-                h.style.opacity = '0';
-            }, 100);
+            const anim = h.animate([
+                { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                { transform: `translateY(-110vh) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+            ], { duration: 3000, easing: 'linear' });
+            anim.onfinish = () => h.remove();
         }
     </script>
 </body>
