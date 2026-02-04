@@ -8,7 +8,8 @@
         :root {
             --cyber-pink: #ff007f;
             --neon-blue: #00f2ff;
-            --deep-red: #c9184a;
+            --daisy-white: #ffffff;
+            --daisy-gold: #ffcc00;
             --glass-white: rgba(255, 255, 255, 0.85);
             --y2k-gradient: linear-gradient(180deg, #00f2ff 0%, #ff007f 100%);
         }
@@ -39,76 +40,78 @@
         }
         .flower-projectile { position: absolute; bottom: -50px; font-size: 35px; }
 
-        /* --- Custom Animated Rose --- */
-        .flower-container { position: relative; width: 150px; height: 160px; margin-bottom: 10px; }
-        .petal { position: absolute; width: 55px; height: 85px; background: linear-gradient(to top, var(--deep-red), var(--cyber-pink)); border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%; left: 48px; transform-origin: bottom center; opacity: 0; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
-        .stem { position: absolute; width: 6px; height: 80px; background: #2d6a4f; left: 72px; top: 80px; border-radius: 5px; opacity: 0; }
-        .bloom-anim { animation: bloomIn 1.5s ease-out forwards; }
-        .stem-anim { animation: fadeIn 1s ease-out 0.5s forwards; }
-
-        @keyframes bloomIn { 0% { transform: scale(0) rotate(0deg); opacity: 0; } 100% { opacity: 0.9; transform: scale(1); } }
-        @keyframes fadeIn { to { opacity: 1; } }
-
-        /* --- Y2K Modals --- */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 88%;
-            max-width: 400px;
-            background: var(--glass-white);
-            border: 3px solid #fff;
-            box-shadow: 8px 8px 0px rgba(0,0,0,0.1);
-            border-radius: 25px;
-            z-index: 1001;
-            backdrop-filter: blur(10px);
-            overflow: hidden;
-            border: 2px solid var(--neon-blue);
+        /* --- Daisy Bouquet Styles --- */
+        #bouquet-container { 
+            position: relative; 
+            width: 300px; 
+            height: 250px; 
+            margin-bottom: 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-end;
         }
 
-        .window-header {
-            background: var(--y2k-gradient);
-            padding: 10px;
-            color: white;
-            font-weight: bold;
-            font-size: 0.8rem;
-            border-bottom: 2px solid #fff;
-        }
-
-        .modal-content { padding: 20px; text-align: center; }
-
-        /* --- Buttons --- */
-        button { 
-            padding: 12px 25px; 
-            border: 2px solid #fff; 
-            border-radius: 50px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: 0.2s;
-            text-transform: uppercase;
-        }
-
-        #yesBtn, #submitBtn, .close-btn {
-            background: linear-gradient(180deg, #ff4db8 0%, #ff007f 100%);
-            color: white;
-        }
-
-        #noBtn { background: linear-gradient(180deg, #00f2ff 0%, #0099ff 100%); color: white; position: absolute; }
+        .daisy { position: absolute; bottom: 0; transform-origin: bottom center; }
         
-        .secondary-btn { 
-            display: none; 
-            width: 240px; 
-            margin: 10px auto;
-            background: white;
-            color: var(--cyber-pink);
-            border: 2px solid var(--cyber-pink);
+        .petal { 
+            position: absolute; 
+            width: 15px; 
+            height: 40px; 
+            background: var(--daisy-white); 
+            border-radius: 50%; 
+            left: 50%; 
+            top: 0;
+            transform-origin: center 40px;
+            opacity: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
-        #valentine-screen { display: none; flex-direction: column; align-items: center; padding-top: 40px; }
-        h1 { color: #fff; text-shadow: 3px 3px var(--cyber-pink); font-size: 1.5rem; text-align: center; }
+        .center {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--daisy-gold);
+            border-radius: 50%;
+            top: 30px;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 2;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+        }
 
+        .stem { 
+            position: absolute; 
+            width: 4px; 
+            background: #2d6a4f; 
+            bottom: 0; 
+            left: 50%; 
+            transform: translateX(-50%);
+            border-radius: 5px; 
+            height: 0;
+        }
+
+        /* --- Animations --- */
+        .bloom-petal { animation: petalGrow 1s ease-out forwards; }
+        .bloom-center { animation: centerGrow 0.5s ease-out forwards; }
+        .grow-stem { animation: stemGrow 1s ease-out forwards; }
+
+        @keyframes stemGrow { to { height: 120px; } }
+        @keyframes centerGrow { to { transform: translate(-50%, -50%) scale(1); } }
+        @keyframes petalGrow { 
+            0% { transform: translate(-50%, 0) scale(0) rotate(var(--rot)); opacity: 0; } 
+            100% { transform: translate(-50%, -30px) scale(1) rotate(var(--rot)); opacity: 1; } 
+        }
+
+        /* --- Modals & Buttons (Restored) --- */
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 88%; max-width: 400px; background: var(--glass-white); border: 2px solid var(--neon-blue); box-shadow: 8px 8px 0px rgba(0,0,0,0.1); border-radius: 25px; z-index: 1001; backdrop-filter: blur(10px); overflow: hidden; }
+        .window-header { background: var(--y2k-gradient); padding: 10px; color: white; font-weight: bold; font-size: 0.8rem; border-bottom: 2px solid #fff; }
+        .modal-content { padding: 20px; text-align: center; }
+        button { padding: 12px 25px; border: 2px solid #fff; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        #yesBtn, #submitBtn, .close-btn { background: linear-gradient(180deg, #ff4db8 0%, #ff007f 100%); color: white; }
+        #noBtn { background: linear-gradient(180deg, #00f2ff 0%, #0099ff 100%); color: white; position: absolute; }
+        .secondary-btn { display: none; width: 240px; margin: 10px auto; background: white; color: var(--cyber-pink); border: 2px solid var(--cyber-pink); }
+        #valentine-screen { display: none; flex-direction: column; align-items: center; padding-top: 20px; }
+        h1 { color: #fff; text-shadow: 3px 3px var(--cyber-pink); font-size: 1.5rem; text-align: center; margin-top: 10px; }
         input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 2px solid var(--neon-blue); border-radius: 12px; }
     </style>
 </head>
@@ -122,9 +125,7 @@
     </div>
 
     <div id="valentine-screen">
-        <div class="flower-container" id="final-flower">
-            <div class="stem" id="stem"></div>
-        </div>
+        <div id="bouquet-container"></div>
 
         <h1 id="valentine-text">You caught my heart!<br>Will you be my Valentine?</h1>
         <div id="hint-text" style="color: #fff; font-weight: bold; opacity: 0; height: 20px;">Nice try! 😉</div>
@@ -144,7 +145,7 @@
         <div class="modal-content">
             <p style="font-style: italic; color: #444; line-height: 1.6; text-align: left;">
                 "My Love at first sight, my inspiration, my light in the darkness, my hope and my purpose, my princess, my ezer. <br><br>
-                This is our <b>4th Valentine</b> and my love for you keeps on growing. You're still the love of my life, now and forever."
+                This is our <b>4th Valentine</b> and my love for you keeps on growing."
                 <br><br>
                 <b>- Your Charming Knight :P</b>
             </p>
@@ -153,7 +154,7 @@
     </div>
 
     <div id="plan-modal" class="modal">
-        <div class="window-header">PLANNER_WIZARD.EXE</div>
+        <div class="window-header">I_LOVE_YOU.EXE</div>
         <div class="modal-content">
             <form id="dateForm" action="https://formspree.io/f/xbdkvkrj" method="POST">
                 <input type="text" name="activity" required placeholder="What do you want to do love?">
@@ -172,6 +173,7 @@
         let basketPos = 50;
         let basketDir = 1;
 
+        // Basket movement
         setInterval(() => {
             basketPos += (2.5 * basketDir);
             if (basketPos > 80 || basketPos < 10) basketDir *= -1;
@@ -182,7 +184,7 @@
             if (score >= 10 || document.getElementById('valentine-screen').style.display === 'flex') return;
             const f = document.createElement('div');
             f.className = 'flower-projectile';
-            f.innerHTML = '🌹';
+            f.innerHTML = '🌼';
             f.style.left = '50%';
             document.getElementById('game-container').appendChild(f);
 
@@ -204,20 +206,50 @@
             }, 16);
         }
 
+        function createDaisy(offsetX, rotation, delay) {
+            const container = document.getElementById('bouquet-container');
+            const daisy = document.createElement('div');
+            daisy.className = 'daisy';
+            daisy.style.left = `calc(50% + ${offsetX}px)`;
+            daisy.style.transform = `rotate(${rotation}deg)`;
+
+            const stem = document.createElement('div');
+            stem.className = 'stem grow-stem';
+            stem.style.animationDelay = delay + 's';
+
+            const center = document.createElement('div');
+            center.className = 'center bloom-center';
+            center.style.animationDelay = (delay + 0.8) + 's';
+
+            daisy.appendChild(stem);
+            daisy.appendChild(center);
+
+            // Create 12 petals for a full daisy
+            for (let i = 0; i < 12; i++) {
+                const petal = document.createElement('div');
+                petal.className = 'petal bloom-petal';
+                petal.style.setProperty('--rot', `${i * 30}deg`);
+                petal.style.animationDelay = (delay + 1 + (i * 0.05)) + 's';
+                daisy.appendChild(petal);
+            }
+
+            container.appendChild(daisy);
+        }
+
         function startValentine() {
             document.getElementById('game-container').style.display = 'none';
             document.getElementById('valentine-screen').style.display = 'flex';
             
-            // Bloom the rose
-            const container = document.getElementById('final-flower');
-            document.getElementById('stem').className = 'stem stem-anim';
-            for(let i=0; i<8; i++) {
-                const p = document.createElement('div');
-                p.className = 'petal bloom-anim';
-                p.style.transform = `rotate(${i * 45}deg)`;
-                p.style.animationDelay = (i * 0.1) + 's';
-                container.appendChild(p);
-            }
+            // Spawn bouquet of 5 daisies
+            const bouquetData = [
+                { x: -60, rot: -25, delay: 0 },
+                { x: -30, rot: -10, delay: 0.3 },
+                { x: 0, rot: 0, delay: 0.6 },
+                { x: 30, rot: 10, delay: 0.4 },
+                { x: 60, rot: 25, delay: 0.1 }
+            ];
+
+            bouquetData.forEach(d => createDaisy(d.x, d.rot, d.delay));
         }
 
         function moveNo() {
@@ -231,7 +263,7 @@
         }
 
         function celebrate() {
-            document.getElementById('valentine-text').innerHTML = "I knew you'd say yes! ❤️";
+            document.getElementById('valentine-text').innerHTML = "sino ba naman ako para tanggihan mo ❤️";
             document.getElementById('mainBtns').style.display = 'none';
             document.getElementById('readLetterBtn').style.display = 'block';
             document.getElementById('planDateBtn').style.display = 'block';
@@ -241,24 +273,9 @@
         function openModal(id) { document.getElementById(id).style.display = 'block'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        document.getElementById("dateForm").addEventListener("submit", async function(e) {
-            e.preventDefault();
-            const status = document.getElementById("status");
-            const data = new FormData(e.target);
-            const response = await fetch(e.target.action, {
-                method: 'POST', body: data, headers: { 'Accept': 'application/json' }
-            });
-            if (response.ok) {
-                status.innerHTML = "SENT! I CAN'T WAIT! 🥰";
-                status.style.color = "var(--cyber-pink)";
-                e.target.reset();
-                setTimeout(() => closeModal('plan-modal'), 2000);
-            }
-        });
-
         function createHeart() {
             const h = document.createElement('div');
-            h.innerHTML = ['💖', '✨', '💿', '🦋'][Math.floor(Math.random()*4)];
+            h.innerHTML = ['💖', '✨', '🌼', '🦋'][Math.floor(Math.random()*4)];
             h.style.position = 'fixed';
             h.style.left = Math.random() * 100 + 'vw';
             h.style.top = '100vh';
