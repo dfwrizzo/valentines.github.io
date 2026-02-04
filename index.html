@@ -124,10 +124,14 @@
         <div id="hint-text" style="color: #fff; font-weight: bold; opacity: 0; height: 20px;">Nice try! 😉</div>
         
         <div id="btnGroup" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-            <div id="mainBtns" style="height: 80px; width: 100%; position: relative; display: flex; justify-content: center; gap: 20px;">
-                <button id="yesBtn" onclick="celebrate()">YES!!</button>
-                <button id="noBtn" onmouseover="moveNo()" ontouchstart="moveNo()">NO</button>
-            </div>
+            <div id="mainBtns" style="height: 80px; width: 100%; position: relative; display: flex; justify-content: center; align-items: center; gap: 30px;">
+    <button id="yesBtn" onclick="celebrate()">YES!!</button>
+    
+    <button id="noBtn" 
+            style="position: relative; transition: none;" 
+            onmouseover="moveNo()" 
+            ontouchstart="moveNo()">NO</button>
+</div>
             <button id="readLetterBtn" class="secondary-btn" onclick="openModal('letter-modal')">Open Message 💌</button>
             <button id="planDateBtn" class="secondary-btn" style="border-color: var(--neon-blue); color: var(--neon-blue);" onclick="openModal('plan-modal')">Planner.exe 🗓️</button>
         </div>
@@ -253,12 +257,23 @@
         }
 
         function moveNo() {
-            noAttempts++;
-            const btn = document.getElementById('noBtn');
-            if (noAttempts >= 3) document.getElementById('hint-text').style.opacity = '1';
-            btn.style.left = Math.random() * (window.innerWidth - 100) + 'px';
-            btn.style.top = Math.random() * (window.innerHeight - 100) + 'px';
-        }
+    noAttempts++;
+    const btn = document.getElementById('noBtn');
+    
+    // Switch to absolute only when she tries to click it
+    if (btn.style.position !== 'absolute') {
+        btn.style.position = 'absolute';
+    }
+
+    if (noAttempts >= 3) document.getElementById('hint-text').style.opacity = '1';
+
+    // Calculate random position while keeping it inside the screen
+    const maxX = window.innerWidth - btn.offsetWidth - 20;
+    const maxY = window.innerHeight - btn.offsetHeight - 20;
+    
+    btn.style.left = Math.floor(Math.random() * maxX) + 'px';
+    btn.style.top = Math.floor(Math.random() * maxY) + 'px';
+}
 
         function celebrate() {
             document.getElementById('valentine-text').innerHTML = "sino ba naman ako para tanggihan mo ❤️";
