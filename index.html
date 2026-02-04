@@ -10,7 +10,7 @@
             --neon-blue: #00f2ff;
             --daisy-white: #ffffff;
             --daisy-gold: #ffcc00;
-            --glass-white: rgba(255, 255, 255, 0.85);
+            --glass-white: rgba(255, 255, 255, 0.9);
             --y2k-gradient: linear-gradient(180deg, #00f2ff 0%, #ff007f 100%);
         }
 
@@ -32,56 +32,27 @@
         #game-container { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; }
         #basket { position: absolute; top: 20px; font-size: 60px; filter: drop-shadow(0 0 8px var(--neon-blue)); z-index: 10; }
         #ui-layer { position: absolute; top: 130px; text-align: center; z-index: 5; width: 100%; }
-        #score-board { 
-            font-size: 32px; 
-            color: #fff; 
-            text-shadow: 2px 2px var(--cyber-pink), -1px -1px var(--neon-blue);
-            font-weight: 900;
-        }
+        #score-board { font-size: 32px; color: #fff; text-shadow: 2px 2px var(--cyber-pink), -1px -1px var(--neon-blue); font-weight: 900; }
         .flower-projectile { position: absolute; bottom: -50px; font-size: 35px; }
 
-        /* --- Daisy Bouquet Styles --- */
+        /* --- Corrected Daisy Bouquet --- */
+        #valentine-screen { display: none; flex-direction: column; align-items: center; padding-top: 40px; height: 100vh; box-sizing: border-box; }
+        
         #bouquet-container { 
             position: relative; 
-            width: 300px; 
+            width: 100%; 
             height: 250px; 
-            margin-bottom: 20px; 
             display: flex; 
             justify-content: center; 
             align-items: flex-end;
+            margin-bottom: 20px;
         }
 
         .daisy { position: absolute; bottom: 0; transform-origin: bottom center; }
         
-        .petal { 
-            position: absolute; 
-            width: 15px; 
-            height: 40px; 
-            background: var(--daisy-white); 
-            border-radius: 50%; 
-            left: 50%; 
-            top: 0;
-            transform-origin: center 40px;
-            opacity: 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .center {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: var(--daisy-gold);
-            border-radius: 50%;
-            top: 30px;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            z-index: 2;
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-        }
-
         .stem { 
             position: absolute; 
-            width: 4px; 
+            width: 5px; 
             background: #2d6a4f; 
             bottom: 0; 
             left: 50%; 
@@ -90,28 +61,57 @@
             height: 0;
         }
 
-        /* --- Animations --- */
-        .bloom-petal { animation: petalGrow 1s ease-out forwards; }
-        .bloom-center { animation: centerGrow 0.5s ease-out forwards; }
-        .grow-stem { animation: stemGrow 1s ease-out forwards; }
-
-        @keyframes stemGrow { to { height: 120px; } }
-        @keyframes centerGrow { to { transform: translate(-50%, -50%) scale(1); } }
-        @keyframes petalGrow { 
-            0% { transform: translate(-50%, 0) scale(0) rotate(var(--rot)); opacity: 0; } 
-            100% { transform: translate(-50%, -30px) scale(1) rotate(var(--rot)); opacity: 1; } 
+        .center {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--daisy-gold);
+            border-radius: 50%;
+            bottom: 120px; 
+            left: 50%; 
+            transform: translate(-50%, 50%) scale(0);
+            z-index: 10;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
         }
 
-        /* --- Modals & Buttons (Restored) --- */
-        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 88%; max-width: 400px; background: var(--glass-white); border: 2px solid var(--neon-blue); box-shadow: 8px 8px 0px rgba(0,0,0,0.1); border-radius: 25px; z-index: 1001; backdrop-filter: blur(10px); overflow: hidden; }
+        .petal { 
+            position: absolute; 
+            width: 12px; 
+            height: 40px; 
+            background: var(--daisy-white); 
+            border-radius: 50% 50% 45% 45%; 
+            left: 50%; 
+            bottom: 120px;
+            transform-origin: center bottom; 
+            opacity: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* --- Animations --- */
+        .grow-stem { animation: stemGrow 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .bloom-center { animation: centerGrow 0.5s ease-out forwards; }
+        .bloom-petal { animation: petalGrow 0.8s ease-out forwards, petalFlutter 3s ease-in-out infinite alternate; }
+
+        @keyframes stemGrow { to { height: 120px; } }
+        @keyframes centerGrow { to { transform: translate(-50%, 50%) scale(1); } }
+        @keyframes petalGrow { 
+            0% { transform: translateX(-50%) rotate(var(--rot)) scale(0); opacity: 0; } 
+            100% { transform: translateX(-50%) rotate(var(--rot)) scale(1); opacity: 1; } 
+        }
+        @keyframes petalFlutter {
+            0% { transform: translateX(-50%) rotate(var(--rot)) scale(1); }
+            100% { transform: translateX(-50%) rotate(calc(var(--rot) + 2deg)) scale(1.02); }
+        }
+
+        /* --- UI & Buttons --- */
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 88%; max-width: 400px; background: var(--glass-white); border: 2px solid var(--neon-blue); border-radius: 25px; z-index: 1001; backdrop-filter: blur(10px); overflow: hidden; }
         .window-header { background: var(--y2k-gradient); padding: 10px; color: white; font-weight: bold; font-size: 0.8rem; border-bottom: 2px solid #fff; }
         .modal-content { padding: 20px; text-align: center; }
         button { padding: 12px 25px; border: 2px solid #fff; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
         #yesBtn, #submitBtn, .close-btn { background: linear-gradient(180deg, #ff4db8 0%, #ff007f 100%); color: white; }
         #noBtn { background: linear-gradient(180deg, #00f2ff 0%, #0099ff 100%); color: white; position: absolute; }
         .secondary-btn { display: none; width: 240px; margin: 10px auto; background: white; color: var(--cyber-pink); border: 2px solid var(--cyber-pink); }
-        #valentine-screen { display: none; flex-direction: column; align-items: center; padding-top: 20px; }
-        h1 { color: #fff; text-shadow: 3px 3px var(--cyber-pink); font-size: 1.5rem; text-align: center; margin-top: 10px; }
+        h1 { color: #fff; text-shadow: 3px 3px var(--cyber-pink); font-size: 1.5rem; text-align: center; margin-bottom: 20px; }
         input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 2px solid var(--neon-blue); border-radius: 12px; }
     </style>
 </head>
@@ -126,7 +126,6 @@
 
     <div id="valentine-screen">
         <div id="bouquet-container"></div>
-
         <h1 id="valentine-text">You caught my heart!<br>Will you be my Valentine?</h1>
         <div id="hint-text" style="color: #fff; font-weight: bold; opacity: 0; height: 20px;">Nice try! 😉</div>
         
@@ -173,7 +172,6 @@
         let basketPos = 50;
         let basketDir = 1;
 
-        // Basket movement
         setInterval(() => {
             basketPos += (2.5 * basketDir);
             if (basketPos > 80 || basketPos < 10) basketDir *= -1;
@@ -219,20 +217,18 @@
 
             const center = document.createElement('div');
             center.className = 'center bloom-center';
-            center.style.animationDelay = (delay + 0.8) + 's';
+            center.style.animationDelay = (delay + 1) + 's';
 
             daisy.appendChild(stem);
             daisy.appendChild(center);
 
-            // Create 12 petals for a full daisy
-            for (let i = 0; i < 12; i++) {
+            for (let i = 0; i < 10; i++) {
                 const petal = document.createElement('div');
                 petal.className = 'petal bloom-petal';
-                petal.style.setProperty('--rot', `${i * 30}deg`);
-                petal.style.animationDelay = (delay + 1 + (i * 0.05)) + 's';
+                petal.style.setProperty('--rot', `${i * 36}deg`); 
+                petal.style.animationDelay = (delay + 1.2 + (i * 0.1)) + 's';
                 daisy.appendChild(petal);
             }
-
             container.appendChild(daisy);
         }
 
@@ -240,15 +236,13 @@
             document.getElementById('game-container').style.display = 'none';
             document.getElementById('valentine-screen').style.display = 'flex';
             
-            // Spawn bouquet of 5 daisies
             const bouquetData = [
-                { x: -60, rot: -25, delay: 0 },
-                { x: -30, rot: -10, delay: 0.3 },
+                { x: -70, rot: -30, delay: 0 },
+                { x: -35, rot: -15, delay: 0.3 },
                 { x: 0, rot: 0, delay: 0.6 },
-                { x: 30, rot: 10, delay: 0.4 },
-                { x: 60, rot: 25, delay: 0.1 }
+                { x: 35, rot: 15, delay: 0.4 },
+                { x: 70, rot: 30, delay: 0.1 }
             ];
-
             bouquetData.forEach(d => createDaisy(d.x, d.rot, d.delay));
         }
 
