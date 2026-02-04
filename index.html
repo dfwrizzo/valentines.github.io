@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>~* Catch My Love v4.0 *~</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💖</text></svg>">
+    
     <style>
         :root {
             --cyber-pink: #ff007f;
@@ -19,11 +21,10 @@
             padding: 0;
             height: 100vh;
             background-color: #ffccd5;
-            /* Grid Pattern + Y2K Couple Overlay */
             background-image: 
                 linear-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.4) 1px, transparent 1px),
-                url('assets/babi.png'); /* Placeholder for a Y2K anime couple style */
+                url('assets/babi.png'); 
             background-size: 25px 25px, 25px 25px, cover;
             background-position: center;
             background-repeat: repeat, repeat, no-repeat;
@@ -33,29 +34,48 @@
             touch-action: manipulation;
         }
 
-        /* Darkening overlay for the game to keep text readable */
-        body::after {
-            content: "";
+        /* Scanline Overlay */
+        body::before {
+            content: " ";
+            display: block;
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 204, 213, 0.3);
-            z-index: -1;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            z-index: 1000;
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
         }
 
+        /* --- Loading Screen Styles --- */
+        #loading-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #c0c0c0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .loading-box { width: 280px; background: #c0c0c0; border: 3px solid; border-color: #fff #808080 #808080 #fff; padding: 2px; }
+        .progress-bar { width: 100%; height: 20px; background: #808080; border: 2px inset #fff; margin-top: 10px; }
+        #progress-fill { width: 0%; height: 100%; background: #000080; }
+        #loading-text { font-size: 12px; color: #000; margin-bottom: 10px; font-family: monospace; }
+
         /* --- Game Elements --- */
-        #game-container { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; z-index: 1; }
-        #basket { position: absolute; top: 20px; font-size: 60px; filter: drop-shadow(0 0 8px var(--neon-blue)); z-index: 10; }
+        #game-container { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; position: relative; }
+        #basket { position: absolute; top: 20px; font-size: 60px; filter: drop-shadow(0 0 8px var(--neon-blue)); z-index: 10; transition: left 0.02s linear; }
         #ui-layer { position: absolute; top: 130px; text-align: center; z-index: 5; width: 100%; }
         #score-board { font-size: 32px; color: #fff; text-shadow: 2px 2px var(--cyber-pink), -1px -1px var(--neon-blue); font-weight: 900; }
         .flower-projectile { position: absolute; bottom: -50px; font-size: 35px; filter: drop-shadow(0 0 5px white); }
 
         /* --- Daisy Bouquet --- */
-        #valentine-screen { display: none; flex-direction: column; align-items: center; padding-top: 40px; height: 100vh; z-index: 2; }
+        #valentine-screen { display: none; flex-direction: column; align-items: center; padding-top: 40px; height: 100vh; z-index: 2; position: relative; }
         #bouquet-container { position: relative; width: 100%; height: 250px; display: flex; justify-content: center; align-items: flex-end; margin-bottom: 20px; }
         .daisy { position: absolute; bottom: 0; transform-origin: bottom center; }
         .stem { position: absolute; width: 5px; background: #2d6a4f; bottom: 0; left: 50%; transform: translateX(-50%); border-radius: 5px; height: 0; }
-        .center { position: absolute; width: 20px; height: 20px; background: var(--daisy-gold); border-radius: 50%; bottom: 120px; left: 50%; transform: translate(-50%, 50%) scale(0); z-index: 10; box-shadow: inset 0 0 5px rgba(0,0,0,0.2); }
-        .petal { position: absolute; width: 12px; height: 40px; background: var(--daisy-white); border-radius: 50% 50% 45% 45%; left: 50%; bottom: 120px; transform-origin: center bottom; opacity: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .center { position: absolute; width: 20px; height: 20px; background: var(--daisy-gold); border-radius: 50%; bottom: 120px; left: 50%; transform: translate(-50%, 50%) scale(0); z-index: 10; }
+        .petal { position: absolute; width: 12px; height: 40px; background: var(--daisy-white); border-radius: 50% 50% 45% 45%; left: 50%; bottom: 120px; transform-origin: center bottom; opacity: 0; }
 
         /* --- Animations --- */
         .grow-stem { animation: stemGrow 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
@@ -64,16 +84,10 @@
 
         @keyframes stemGrow { to { height: 120px; } }
         @keyframes centerGrow { to { transform: translate(-50%, 50%) scale(1); } }
-        @keyframes petalGrow { 
-            0% { transform: translateX(-50%) rotate(var(--rot)) scale(0); opacity: 0; } 
-            100% { transform: translateX(-50%) rotate(var(--rot)) scale(1); opacity: 1; } 
-        }
-        @keyframes petalFlutter {
-            0% { transform: translateX(-50%) rotate(var(--rot)) scale(1); }
-            100% { transform: translateX(-50%) rotate(calc(var(--rot) + 2deg)) scale(1.02); }
-        }
+        @keyframes petalGrow { 0% { transform: translateX(-50%) rotate(var(--rot)) scale(0); opacity: 0; } 100% { transform: translateX(-50%) rotate(var(--rot)) scale(1); opacity: 1; } }
+        @keyframes petalFlutter { 0% { transform: translateX(-50%) rotate(var(--rot)) scale(1); } 100% { transform: translateX(-50%) rotate(calc(var(--rot) + 2deg)) scale(1.02); } }
 
-        /* --- Modals & Buttons --- */
+        /* --- UI & Buttons --- */
         .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 88%; max-width: 400px; background: var(--glass-white); border: 2px solid var(--neon-blue); border-radius: 25px; z-index: 1001; backdrop-filter: blur(10px); }
         .window-header { background: var(--y2k-gradient); padding: 10px; color: white; font-weight: bold; font-size: 0.8rem; border-bottom: 2px solid #fff; }
         .modal-content { padding: 20px; text-align: center; }
@@ -86,6 +100,16 @@
     </style>
 </head>
 <body onclick="shootFlower()">
+
+    <div id="loading-screen">
+        <div class="loading-box">
+            <div class="window-header">SYSTEM_BOOT.EXE</div>
+            <div class="loading-content">
+                <p id="loading-text">Connecting to Heart.net...</p>
+                <div class="progress-bar"><div id="progress-fill"></div></div>
+            </div>
+        </div>
+    </div>
 
     <div id="game-container">
         <div id="basket">🧺</div>
@@ -130,12 +154,32 @@
                 <input type="text" name="location" required placeholder="Where do you wanna go?">
                 <textarea name="requests" rows="2" placeholder="Gift/Special requests?"></textarea>
                 <button type="submit" id="submitBtn" style="width: 100%; margin-top: 10px;">SEND IT TO MEE</button>
-                <div id="status" style="margin-top: 10px; font-weight: bold;"></div>
             </form>
         </div>
     </div>
 
     <script>
+        // --- Initialization & Loading ---
+        window.onload = () => {
+            let progress = 0;
+            const fill = document.getElementById('progress-fill');
+            const text = document.getElementById('loading-text');
+            const msgs = ["Dialing 0917-LOVE...", "Bypassing Firewall...", "Downloading Butterflies...", "Finalizing Love.exe..."];
+            const interval = setInterval(() => {
+                progress += Math.random() * 12;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(() => document.getElementById('loading-screen').style.display = 'none', 500);
+                }
+                fill.style.width = progress + "%";
+                if(progress > 25) text.innerText = msgs[1];
+                if(progress > 50) text.innerText = msgs[2];
+                if(progress > 75) text.innerText = msgs[3];
+            }, 150);
+        };
+
+        // --- Game Logic ---
         let score = 0;
         let noAttempts = 0;
         const basket = document.getElementById('basket');
@@ -143,7 +187,7 @@
         let basketDir = 1;
 
         setInterval(() => {
-            basketPos += (2.5 * basketDir);
+            basketPos += (2.0 * basketDir);
             if (basketPos > 80 || basketPos < 10) basketDir *= -1;
             basket.style.left = basketPos + '%';
         }, 20);
@@ -155,14 +199,12 @@
             f.innerHTML = '🌼';
             f.style.left = '50%';
             document.getElementById('game-container').appendChild(f);
-
             let currentBottom = 0;
             const shootInterval = setInterval(() => {
                 currentBottom += 15;
                 f.style.bottom = currentBottom + 'px';
                 const fRect = f.getBoundingClientRect();
                 const bRect = basket.getBoundingClientRect();
-
                 if (fRect.top <= bRect.bottom && fRect.left < bRect.right && fRect.right > bRect.left) {
                     score++;
                     document.getElementById('score').innerText = score;
@@ -174,6 +216,7 @@
             }, 16);
         }
 
+        // --- Valentine Logic ---
         function createDaisy(offsetX, rotation, delay) {
             const container = document.getElementById('bouquet-container');
             const daisy = document.createElement('div');
@@ -205,25 +248,16 @@
         function startValentine() {
             document.getElementById('game-container').style.display = 'none';
             document.getElementById('valentine-screen').style.display = 'flex';
-            
-            const bouquetData = [
-                { x: -70, rot: -30, delay: 0 },
-                { x: -35, rot: -15, delay: 0.3 },
-                { x: 0, rot: 0, delay: 0.6 },
-                { x: 35, rot: 15, delay: 0.4 },
-                { x: 70, rot: 30, delay: 0.1 }
-            ];
-            bouquetData.forEach(d => createDaisy(d.x, d.rot, d.delay));
+            const data = [{x:-70,r:-30,d:0},{x:-35,r:-15,d:0.3},{x:0,r:0,d:0.6},{x:35,r:15,d:0.4},{x:70,r:30,d:0.1}];
+            data.forEach(d => createDaisy(d.x, d.r, d.d));
         }
 
         function moveNo() {
             noAttempts++;
             const btn = document.getElementById('noBtn');
             if (noAttempts >= 3) document.getElementById('hint-text').style.opacity = '1';
-            const maxX = window.innerWidth - btn.offsetWidth - 20;
-            const maxY = window.innerHeight - btn.offsetHeight - 20;
-            btn.style.left = Math.floor(Math.random() * maxX) + 'px';
-            btn.style.top = Math.floor(Math.random() * maxY) + 'px';
+            btn.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+            btn.style.top = Math.random() * (window.innerHeight - 100) + 'px';
         }
 
         function celebrate() {
@@ -231,11 +265,8 @@
             document.getElementById('mainBtns').style.display = 'none';
             document.getElementById('readLetterBtn').style.display = 'block';
             document.getElementById('planDateBtn').style.display = 'block';
-            for(let i=0; i<30; i++) { setTimeout(createHeart, i * 100); }
+            for(let i=0; i<30; i++) setTimeout(createHeart, i * 100);
         }
-
-        function openModal(id) { document.getElementById(id).style.display = 'block'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
         function createHeart() {
             const h = document.createElement('div');
@@ -244,9 +275,13 @@
             h.style.left = Math.random() * 100 + 'vw';
             h.style.top = '100vh';
             h.style.fontSize = '25px';
+            h.style.zIndex = '2000';
             document.body.appendChild(h);
             h.animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: `translateY(-110vh) rotate(360deg)`, opacity: 0 }], { duration: 3000 }).onfinish = () => h.remove();
         }
+
+        function openModal(id) { document.getElementById(id).style.display = 'block'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     </script>
 </body>
 </html>
